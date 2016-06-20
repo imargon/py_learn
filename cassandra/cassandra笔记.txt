@@ -1,0 +1,43 @@
+
+2.交互式命令窗口运行Cqlsh
+cqlsh 127.0.0.1 9042  
+
+create keyspace photos with replication={'class':'SimpleStrategy','replication_factor':3};
+use photos;
+select * from system.schema_keyspaces;
+CREATE TABLE photos( photo_type text,
+ insertion_time timestamp,
+ photo blob, 
+ photo_url text, 
+ content text, 
+ PRIMARY KEY(photo_type,insertion_time)) 
+ WITH CLUSTERING ORDER BY(insertion_time DESC);
+
+create table cqlusers(user_id int PRIMARY KEY, uname text, email text, state int,gender int,lastlogin Timestamp);
+
+INSERT INTO cqlusers (user_id, uname , email,state,gender,lastlogin) VALUES (1,'zxh','piaolingzxh@qq.com',1,1,'now');
+INSERT INTO cqlusers (user_id, uname , email,state,gender,lastlogin) VALUES (2,'zxh2','piaolingzxh@qq2.com',1,1,'now');
+
+insert into photos (photo_type,insertion_time,photo_url,content) values('workman','2015-09-18 01:13:22-0000','http://localhost/image.png','11111content');
+
+
+CREATE TABLE songs (
+  id uuid PRIMARY KEY,
+  title text,
+  album text,
+  artist text,
+  data blob
+ );
+ 
+ 
+ CREATE TABLE playlists (
+  id uuid,
+  song_order int,
+  song_id uuid,
+  title text,
+  album text,
+  artist text,
+  PRIMARY KEY  (id, song_order ) );
+  
+  
+  INSERT INTO playlists (id, song_order, song_id, title, artist, album) VALUES (62c36092-82a1-3a00-93d1-46196ee77204, 4,7db1a490-5878-11e2-bcfd-0800200c9a66,'Ojo Rojo', 'Fu Manchu', 'No One Rides for Free');
