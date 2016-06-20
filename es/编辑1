@@ -1,0 +1,30 @@
+﻿curl -XGET 'http://localhost:9200/abc/employee/_search' -d '
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+                    "age" : { "gt" : 30 } 
+                }
+            },
+            "query" : {
+                "match" : {
+                    "last_name" : "smith" 
+                }
+            }
+        }
+    }
+}
+
+curl -XGET 'http://localhost:9200/abc/employee/_search' -d '
+{
+  "aggs": {
+    "all_interests": {
+      "terms": { "field": "interests" }
+    }
+  }
+}
+
+
+
+

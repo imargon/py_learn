@@ -1,0 +1,20 @@
+#!/usr/bin/python 3
+#encoding:utf-8
+
+__author__ = 'zhen'
+
+class Desc:
+    def __get__(self, ins, cls):
+        print('self in Desc: %s ' % self )
+        print(self,ins,cls)
+class Test:
+    x = Desc()
+    def prt(self):
+        print('self in Test: %s' % self)
+t = Test()
+t.prt()
+print('************')
+t.x
+
+
+

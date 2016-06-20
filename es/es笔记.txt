@@ -1,0 +1,689 @@
+﻿
+# 1.本机地址
+http://localhost:5601/app/sense
+kopf 插件：
+http://localhost:9200/_plugin/kopf/#!/cluster
+
+插件安装:
+plugin install lmenezes/elasticsearch-kopf
+
+传统关系型数据库与ElasticSearch的对比。
+
+Relational DB => Databases=> Tables=> Rows => Columns
+Elasticsearch => Indices  => Types => Documents => Fields
+
+本例中，Indices为hbc，Types为emp
+
+1.提供文档到ElasticSearch进行索引
+
+curl -XPUT 'http://localhost:9200/hbc/emp/1' -d '
+{
+    "first_name" : "cheyo",
+    "last_name" :  "hou",
+    "age" :        25,
+    "about" :      "I love to go rock climbing",
+    "interests": [ "sports", "music" ]
+}
+
+curl -XPUT 'http://localhost:9200/hbc/emp/2' -d '
+{
+    "first_name" :  "Jane",
+    "last_name" :   "Smith",
+    "age" :         32,
+    "about" :       "I like to collect rock albums",
+    "interests":  [ "music" ]
+}
+#等同以上语法
+PUT /hbc/emp/2
+{
+    "first_name" :  "Jane",
+    "last_name" :   "Smith",
+    "age" :         32,
+    "about" :       "I like to collect rock albums",
+    "interests":  [ "music" ]
+}
+
+POST /hbc/emp?pretty
+{ "id":3,
+  "first_name" : "Peng",
+  "last_name":"zhen",
+  "age":26,
+  "about":"This is a es example",
+  "interests":[" table tennis"]
+}
+
+
+
+
+2.查询被索引文档的详细内容
+curl -XGET 'http://localhost:9200/hbc/emp/1'
+GET /hbc/emp/1
+
+3.搜索出所有的被索引文档
+curl -XGET 'http://localhost:9200/hbc/emp/_search'
+GET /hbc/emp/_search
+
+4.指定关键Field进行搜索
+curl -XGET 'http://localhost:9200/hbc/emp/_search?q=last_name:hou'
+GET /hbc/emp/_search?q=last_name:hou
+
+5.指定关键Field进行搜索(Search Lite)
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "query" : {
+        "match" : {
+            "last_name" : "hou"
+        }
+    }
+}
+
+GET /hbc/emp/_search
+{
+    "query" : {
+        "match" : {
+            "last_name" : "hou"
+        }
+    }
+}
+6.指定关键Field进行精确搜索(使用Query DSL)
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+                    "age" : { "gt" : 30 } 
+                }
+            },
+            "query" : {
+                "match" : {
+                    "last_name" : "smith" 
+                }
+            }
+        }
+    }
+}
+
+#指定列查询
+GET /hbc/tweet/1?fields=message,user&pretty=true
+
+#指定查询返回格式
+GET /hbc/tweet/1?fields=message,user&format=yaml
+
+#ES的搜索功能是可以跨index和type的，例如下面这几条命令
+
+curl -XGET 'http://localhost:9200/hbc/_search?q=user:kimchy'
+curl -XGET 'http://localhost:9200/hbc/tweet,user/_search?q=user:kimchy'
+curl -XGET 'http://localhost:9200/kimchy,elasticsearch/tweet/_search?q=tag:wow'
+curl -XGET 'http://localhost:9200/_all/tweet/\_search?q=tag:wow'
+curl -XGET 'http://localhost:9200/\_search?q=tag:wow'
+#等价以上句法
+GET /hbc/_search?q=user:kimchy
+GET /hbc/tweet,user/_search?q=user:kimchy
+GET /kimchy,elasticsearch/tweet/_search?q=tag:wow
+GET /_all/tweet/\_search?q=tag:wow
+GET /\_search?q=tag:wow
+
+
+GET /hbc/emp/_search
+{
+
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+                    "age" : { "gt" : 30 } 
+                }
+            },
+            "query" : {
+                "match" : {
+                    "last_name" : "smith" 
+                }
+            }
+        }
+    }
+}
+7.全文检索
+#只含有部分关键字的文档也会被检索出来，结果中包含匹配度。
+
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "query" : {
+        "match" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+8.全文精确检索
+#必须同时含有所有的关键字：
+
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+'
+9.高亮检索结果关键字
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock climbing"
+        }
+    },
+    "highlight": {
+        "fields" : {
+            "about" : {}
+        }
+    }
+}
+
+10.统计分析
+
+统计某一个Field的总数排名
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+  "aggs": {
+    "all_interests": {
+      "terms": { "field": "interests" }
+    }
+  }
+}
+
+11.限定范围统计排名
+ 只统计last_name为smith的人，其interest的统计排名
+
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+  "query": {
+    "match": {
+      "last_name": "smith"
+    }
+  },
+  "aggs": {
+    "all_interests": {
+      "terms": {
+        "field": "interests"
+      }
+    }
+  }
+}
+
+12.统计排名可以嵌套
+ 只统计last_name为smith的人，其interest的个数统计排名，平均年龄：
+
+curl -XGET 'http://localhost:9200/hbc/emp/_search' -d '
+{
+    "aggs" : {
+        "all_interests" : {
+            "terms" : { "field" : "interests" },
+            "aggs" : {
+                "avg_age" : {
+                    "avg" : { "field" : "age" }
+                }
+            }
+        }
+    }
+}
+
+12.删除文档
+curl -XDELETE 'http://localhost:9200/twitter/'
+
+13.获取索引信息
+
+$ curl -XGET localhost:9200/movie
+$ curl -XGET localhost:9200/movie/_aliases
+$ curl -XGET localhost:9200/movie/_mapping
+$ curl -XGET localhost:9200/movie/_setting
+Get到的是索引的aliases、mappings、setting等信息。
+
+14.Open/Close索引
+
+关闭一个索引之后，将不能read/write
+curl -XPOST 'localhost:9200/my_index/_close'
+curl -XPOST 'localhost:9200/my_index/_open'
+
+15.检查文档是否存在
+curl -i -XHEAD 'http://localhost:9200/hbc/emp/1'
+HTTP/1.1 200 OK
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 0
+
+16.获取多个文档
+Multi Get使用关键字_mget，可以一次获取多个文档，而且这些文档可以跨索引、跨类型。
+
+
+
+17.Bulk API使用关键字_bulk，允许我们通过一次请求来实现多个文档的create、index、update或delete。
+
+
+18.关闭所有节点
+
+curl -XPOST 'http://localhost:9200/shutdown'
+
+19.关闭指定节点
+curl -XPOST 'http://localhost:9200/_cluster/nodes/nodeId1,nodeId2/shutdown'
+
+20.延迟关闭
+curl -XPOST 'http://localhost:9200/_cluster/nodes/local/_shutdown?delay=10s'
+
+
+
+
+**********************************************
+
+1.查询所有的index
+curl -XGET 127.0.0.1:9200/_cat/indices
+GET /_cat/indices
+2.查询所有的index为hbc的
+GET /_cat/indices/hbc
+3.查询index为hbc下的所有数据
+GET /hbc/_search
+4.查询index为hbc,type为dbmoive下的所有数据
+GET /hbc/dbmoive/_search
+
+
+
+**********************************************
+#1.XPOST 插入数据
+curl -XPOST http://127.0.0.1:9200/pz/1 -d '{"first_name":"John","last_name":"Smith","age":25,"about":"I love to go rockc limbing","interests":["sports","music"]}'
+curl -XPOST http://127.0.0.1:9200/pz/2 -d '{"first_name":"Jane","last_name":"Smith","age":32,"about":"I like to collect rock albums","interests":["music"]}'
+curl -XPOST http://127.0.0.1:9200/pz/3 -d '{"first_name":"Douglas","last_name":"Fir","age":35,"about":"I like to build cabinets","interests":["forestry"]}'
+
+#GET /hbc/tweet/_search?pretty
+#GET /hbc/tweet/1?fields=message,user&format=yaml
+
+#GET /hbc/tweet/1?fields=message,user&pretty=true
+
+POST /hbc/tweet/
+{
+  "user":"margon",
+  "post_date":"2016-03-18T11:08:12",
+  "message":"This is the first Tweet",
+  "counter":1
+}
+
+
+POST /hbc/tweet/1/_update
+{
+
+    "script" : "ctx._source.counter += count",
+
+    "params" : {
+
+        "count" : 4
+
+    }
+
+}
+
+GET /hbc/tweet/_search?q=user:margon
+
+GET /hbc/tweet/_search
+{
+
+    "query" : {
+
+        "term" : { "user" : "kimchy" }
+
+    }
+
+}
+
+# 各种跨type搜索
+GET /hbc/_search?q=user:kimchy
+GET /hbc/tweet,user/_search?q=user:kimchy
+GET /kimchy,elasticsearch/tweet/_search?q=tag:wow
+GET /_all/tweet/\_search?q=tag:wow
+GET /\_search?q=tag:wow
+
+GET /test/type1/_search
+
+POST /test/type1/1/_update
+{
+
+    "script" : {
+        "inline": "ctx._source.counter += count",
+        "params" : {
+            "count" : 4
+        }
+    }
+
+}
+
+#查看node和集群healthy
+GET /_cat/health?v
+GET /_cat/nodes?v
+
+#list all index
+
+GET /_cat/indices?v
+
+# create index
+PUT /hbc/emp/1?pretty
+{
+  "name":"John Done"
+}
+
+# search index
+
+GET /hbc/emp/_search
+
+#delete doc
+DELETE /hbc/emp/?pretty 
+{
+  
+  
+}
+
+# update doc
+
+POST /hbc/emp/1/_update?pretty
+{
+  "doc":{
+    "name":"Jane Doe"
+  }
+}
+
+POST /hbc/emp/1/_update?pretty
+{
+  "doc":{
+    "name":"Jane Doe",
+    "age":20
+  }
+  
+}
+
+
+#update doc ,execute script
+POST /hbc/emp/1/_update?pretty
+{
+   "script":"ctx._source.age+=5" 
+}
+
+
+PUT /test/type1/1
+{
+    "counter" : 1,
+    "tags" : ["red"]
+}
+
+POST /test/type1/1/_update
+{
+
+    "script" : {
+        "inline": "ctx._source.counter += count",
+        "params" : {
+            "count" : 4
+        }
+    }
+}
+
+POST /test/type1/1/_update
+{
+    "script" : {
+        "inline": "ctx._source.tags += tag",
+        "params" : {
+            "tag" : "blue"
+        }
+    }
+}
+
+#Solution:elasticsearch.yml,addon the end of the file
+
+#script.inline: on 
+#script.indexed: on
+
+#bulk 
+
+POST /hbc/emp/_bulk?pretty
+{"index":{"_id":"5"}}
+{"name":"Jane One"}
+{"index":{"_id":"6"}}
+{"name":"Jobs Steven"}
+
+
+### add a new field to the document:
+
+
+POST /test/type1/1/_update
+{
+
+    "script" : "ctx._source.name_of_new_field = \"value_of_new_field\""
+
+}
+
+
+### remove a field from the document:
+
+
+POST /test/type1/1/_update
+{
+
+    "script" : "ctx._source.remove(\"name_of_new_field\")"
+
+}
+
+GET /test/type1/_search
+
+### This example deletes the doc if the tags field contain blue, otherwise it does nothing (noop):
+
+
+POST /test/type1/1/_update
+{
+
+  "script" : {"inline": "ctx._source.tags.contains(tag) ? ctx.op =\"delete\" : ctx.op = \"none\"",
+  "params" : { "tag" : "blue"}
+    }
+}
+
+#GET /_cluster/health?pretty
+GET   _cluster/health/hbc
+GET   _cluster/state
+
+
+GET /_nodes?pretty
+GET /_nodes/stats
+
+GET _cat/health
+GET _cat/master
+GET _cat/count
+GET _cat/nodes
+GET _cat/allocation
+#s输出每个shard的统计信息
+GET _cat/shards
+
+
+GET _cat/indices/
+GET /hhc/_search
+#关闭所有节点
+POST /shutdown
+#启动所有节点
+POST /start
+
+
+GET /hbc/dbmoive/_search?q=name:"Avengers: Age of Ultron"
+
+POST /hbc/dbmoive/
+{
+  
+    "name": "Avengers: Age of Ultron",
+    "rating": 7.8,
+    "description": "When Tony Stark and Bruce Banner try to jump-start a dormant peacekeeping...",
+    "stars": ["Joss Whedon","Robert Downey Jr","Chris Evans","Mark Ruffalo"],
+    "type": ["Action","Adventure","Sci-Fi"],
+    "runtime": 141
+}
+
+GET /hbc/dbmoive/_search
+{
+  "query": {
+    "term": {
+      "rating": 7.8
+    },
+    "agg":{
+      "max_rating":{
+        "max":{"field":"rating"}
+      }
+      
+    }
+  }
+}
+
+
+
+GET  /hbc/emp/_search
+#指定关键Field进行搜索(Search Lite)
+GET /hbc/emp/_search
+{
+
+    "query" : {
+        "match" : {
+            "last_name" : "Smith"
+        }
+    }
+}
+
+
+#指定关键Field进行精确搜索(使用Query DSL)
+GET /hbc/emp/_search
+{
+
+    "query" : {
+        "filtered" : {
+            "filter" : {
+                "range" : {
+
+                    "age" : { "gt" : 30 } 
+                }
+            },
+
+            "query" : {
+                "match" : {
+                    "last_name" : "Smith" 
+                }
+            }
+        }
+    }
+}
+
+
+# 全文模糊匹配 只含有部分关键字的文档也会被检索出来，结果中包含匹配度。
+GET /hbc/emp/_search
+{
+
+    "query" : {
+        "match" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+
+
+### 全文精确检索
+
+### 必须同时含有所有的关键字：
+
+
+GET /hbc/emp/_search
+{
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock climbing"
+        }
+    }
+}
+
+
+### 高亮检索结果关键字
+
+GET /hbc/emp/_search
+{
+
+    "query" : {
+        "match_phrase" : {
+            "about" : "rock "
+        }
+    },
+
+    "highlight": {
+        "fields" : {
+            "about" : {}
+        }
+    }
+}
+
+
+#统计某一个Field的总数排名
+GET /hbc/emp/_search
+{
+  "aggs": {
+    "all_interests": {
+      "terms": { "field": "interests" }
+    }
+  }
+}
+
+
+### 只统计last_name为smith的人，其interest的统计排名
+
+
+GET /hbc/emp/_search
+{
+
+  "query": {
+    "match": {
+      "last_name": "smith"
+    }
+  },
+
+  "aggs": {
+    "all_interests": {
+      "terms": {
+        "field": "interests"
+      }
+    }
+  }
+}
+
+
+#统计排名可以嵌套
+#只统计last_name为smith的人，其interest的个数统计排名，平均年龄：
+
+GET /hbc/emp/_search
+{
+  "query" : {
+    "match": {
+      "last_name": "Smith"
+    }
+    
+  },
+    "aggs" : {
+        "all_interests" : {
+            "terms" : { "field" : "interests" },
+            "aggs" : {
+                "avg_age" : {
+                    "avg" : { "field" : "age" }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
