@@ -67,13 +67,10 @@ def img_batchamark():
     for image_name in image_list:
         image_name = image_dir+image_name
         pic_addwatermark(image_name, image_text, image_font)
-        # pic_addlogo(image_name, image_logo)
 
 
 def img_batchlogo():
     for image_name in glob.glob(os.path.join(image_dir, '*.png')):
-        # image_name = image_dir+image_name
-        # pic_addwatermark(image_name, image_text, image_font)
         pic_addlogo(image_name, image_logo)
 
 
