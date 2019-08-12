@@ -1,0 +1,10 @@
+python -m pip install gm -U -i https://pypi.mirrors.ustc.edu.cn/simple/
+
+国内比较好用的源有: 
+pypi.python.org 官方源 
+pypi.douban.com 豆瓣源，福州 
+pypi.hustunique.com 华中科技大学源，武汉 
+pypi.tuna.tsinghua.edu.cn 清华源，北京
+http://pypi.mirrors.ustc.edu.cn/simple/ 中国科学技术大学
+
+python -m pip install --upgrade pip
