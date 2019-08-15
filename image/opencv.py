@@ -85,3 +85,16 @@ dst = cv2.warpPerspective(img,M,(300,300))
 plt.subplot(121),plt.imshow(img),plt.title('Input')
 plt.subplot(122),plt.imshow(dst),plt.title('Output')
 plt.show()
+
+###
+import cv2
+
+img = cv2.imread('F:/py/pic/butterfly.jpg', cv2.IMREAD_COLOR)    # 打开文件
+font = cv2.FONT_HERSHEY_DUPLEX  # 设置字体
+# 图片对象、文本、像素、字体、字体大小、颜色、字体粗细
+imgzi = cv2.putText(img, "FONT_HERSHEY_DUPLEX ", (1100, 1164), font, 5.5, (0, 0, 0), 2,)
+cv2.imshow('lena', img)
+cv2.imwrite('F:/py/pic/5.png', img)    # 写磁盘
+
+cv2.destroyAllWindows()     # 毁掉所有窗口
+# cv2.destroyWindow(wname)    # 销毁指定窗口
