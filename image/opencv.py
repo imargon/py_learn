@@ -50,13 +50,11 @@ out = Image.composite(layer,im,layer)
 out.show()
 
 def run():
-    print
-    "hello"
-
-
+    print "hello"
+    
 if __name__ == "__main__":
-    run()    
-
+    run()
+   
 #https://docs.opencv.org/3.3.0/da/d6e/tutorial_py_geometric_transformations.html   
     
 import cv2
