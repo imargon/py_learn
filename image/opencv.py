@@ -87,23 +87,28 @@ plt.subplot(122),plt.imshow(dst),plt.title('Output')
 plt.show()
 
 ###
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import cv2
 import os
 
-image_dir ='F:/py/pic/image/'
+image_dir = "F:/py/pic/image/"
 image_path = os.path.join(image_dir)
 image_list = os.listdir(image_path)
+n = 0
 
 for image_name in image_list:
+    n = n+1
     image_name = image_dir+image_name
     print(image_name)
-    image_cv2 = cv2.imread(image_path, cv2.IMREAD_COLOR)    # 打开文件
+    image_cv2 = cv2.imread(image_name, cv2.IMREAD_COLOR)    # 打开文件
     image_font = cv2.FONT_HERSHEY_DUPLEX  # 设置字体
     image_color = (0, 0, 0)
     # 图片对象、文本、像素、字体、字体大小、颜色、字体粗细
     imgzi = cv2.putText(image_cv2, "FONT_HERSHEY_DUPLEX ", (1100, 1164), image_font, 5.5, image_color, 2,)
     cv2.imshow('demo', image_cv2)
-    # cv2.imwrite(image_dir, image_cv2)    # 写磁盘
-    #
-    # cv2.destroyAllWindows()     # 毁掉所有窗口
-    # # cv2.destroyWindow(wname)    # 销毁指定窗口
+    cv2.imwrite(image_dir+'image_'+str(n)+'.jpg', image_cv2)    # 写磁盘
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()     # 毁掉所有窗口
+    # cv2.destroyWindow(demo)    # 销毁指定窗口
