@@ -89,9 +89,10 @@ plt.show()
 ###
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-import cv2
 import os
+import cv2
+import numpy
+from PIL import Image, ImageDraw, ImageFont
 
 image_dir = "F:/py/pic/image/"
 image_path = os.path.join(image_dir)
@@ -100,13 +101,30 @@ n = 0
 
 for image_name in image_list:
     n = n+1
-    image_name = image_dir+image_name
-    print(image_name)
+    image_name = image_dir + image_name
     image_cv2 = cv2.imread(image_name, cv2.IMREAD_COLOR)    # 打开文件
-    image_font = cv2.FONT_HERSHEY_DUPLEX  # 设置字体
-    image_color = (0, 0, 0)
-    # 图片对象、文本、像素、字体、字体大小、颜色、字体粗细
-    imgzi = cv2.putText(image_cv2, "FONT_HERSHEY_DUPLEX ", (1100, 1164), image_font, 5.5, image_color, 2,)
+    height, width, colors = image_cv2.shape
+    image_PIL = Image.fromarray(cv2.cvtColor(image_cv2, cv2.COLOR_BGR2RGB))
+    print(height, width, colors)
+    x = width - 620
+    y = height - 400
+    watermark_position = (x, y)
+
+    # image_font = cv2.FONT_HERSHEY_DUPLEX  # cv2 设置字体
+
+    image_font = ImageFont.truetype('C:/Windows/Fonts/SIMLI.TTF', 200)
+    image_color = (255, 255, 25, 20)
+    image_text = '蝴 蝶'
+
+    # cv2 待处理的图片、待添加的文字、添加位置坐标（文字左下角）、文字、大小、颜色、文字粗细
+    # imgzi = cv2.putText(image_cv2, image_text, watermark_position, image_font, 5.5, image_color, 2,)
+    # 左上角为画布坐标（0,0）点
+    draw = ImageDraw.Draw(image_PIL)
+    draw.text(watermark_position, image_text, image_color, image_font)
+
+    # 重新转换为opencv格式
+
+    image_cv2 = cv2.cvtColor(numpy.asarray(image_PIL), cv2.COLOR_BGR2RGB)
     cv2.imshow('demo', image_cv2)
     cv2.imwrite(image_dir+'image_'+str(n)+'.jpg', image_cv2)    # 写磁盘
     cv2.waitKey(0)
