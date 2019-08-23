@@ -1,22 +1,9 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
-
-__author__ = 'zhen'
-
-# -*- coding=utf-8 -*-
-
 # code related at: http://www.cnblogs.com/daniel-D/
 
 import numpy as np
 import pylab as pl
 import scipy.spatial.distance as dist
-
 
 def plotSamples(x, y, z=None):
 
