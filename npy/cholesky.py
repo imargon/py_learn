@@ -54,25 +54,5 @@ dots = (Z * np.matrix([[3, -2, 0], [3, 2, 0]])).T
 print '\n变换后到原点的欧几里得距离分别是：'
 print dist.minkowski([0, 0], np.array(dots[0]), 2), dist.minkowski([0, 0], np.array(dots[1]), 2)
 
-def run():
-    print "hello"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
-    run()    
+    plotSamples()
