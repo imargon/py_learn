@@ -1,3 +1,6 @@
+#http://www.pianshen.com/article/6145175152/
+#https://www.cnblogs.com/liangyan-1989/p/8145469.html
+
 #copy.copy()与copy.deepcopy()
 #直接赋值：其实就是对象的引用（别名）,赋值的两个对象还是同一个对象
 #copy.copy() 浅拷贝, a 和 b 是一个独立的对象，但他们的子对象还是指向统一对象（是引用）。
