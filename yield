@@ -26,6 +26,13 @@ for i in myGen:
     print(i)
 
 # Yield是关键字， 用起来像return，yield在告诉程序，要求函数返回一个生成器。
+# send(msg) 与 next()
+# 了解了next()如何让包含yield的函数执行后，我们再来看另外一个非常重要的函数send(msg)。
+# 其实next()和send()在一定意义上作用是相似的
 
+# 区别
+# send()可以传递yield的值
+# next()只能传递None。
+# 所以next() 和 send(None)作用是一样的。
 
 
