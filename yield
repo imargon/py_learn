@@ -34,5 +34,5 @@ for i in myGen:
 # send()可以传递yield的值
 # next()只能传递None。
 # 所以next() 和 send(None)作用是一样的。
-
+# 注意 生成器刚启动时(第一次调用)，请使用next()语句或是send(None)，不能直接发送一个非None的值，否则会报TypeError，因为没有yield语句来接收这个值。
 
