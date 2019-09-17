@@ -1,0 +1,31 @@
+# 迭代器(Iterator)
+# 使用for.in.来操作可迭代对象，如：list,string,files,这些迭代对象非常方便我们使用，因为你可以按照你的意愿进行重复的读取。
+# 但是你不得不预先存储所有的元素在内存中，那些对象里有很多元素时，并不是每一项都对你有用。
+
+l1 = [1,2,4,78,9,10]
+for i in sorted(l1):
+    print(i)
+l2 = range(8,1,-2)
+for i2 in l2:
+    print(i2)
+
+# 生成器(Generators)
+# 生成器同样是可迭代对象，但是你只能读取一次，因为它并没有把所有值存放内存中，它动态的生成值：
+
+mygen =  ( x*x for x in  range(8))
+for i in mygen:
+    print(i)
+
+def  MyGenerator():
+    mylist = range(8)
+    for i in mylist:
+        yield i*i
+myGen = MyGenerator()
+print(myGen)
+for i in myGen:
+    print(i)
+
+# Yield是关键字， 用起来像return，yield在告诉程序，要求函数返回一个生成器。
+
+
+
