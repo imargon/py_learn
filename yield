@@ -37,3 +37,78 @@ for i in myGen:
 # 所以next() 和 send(None)作用是一样的。
 # 注意 生成器刚启动时(第一次调用)，请使用next()语句或是send(None)，不能直接发送一个非None的值，否则会报TypeError，因为没有yield语句来接收这个值。
 
+import itertools
+ita = iter([1,2,3])
+print(type(ita))
+print(next(ita))
+print(next(ita))
+print(next(ita))
+# print(next(ita))
+# 为容器对象添加 __iter__() 和 __next__() 方法；__iter__() 返回迭代器对象本身 self，__next__() 则返回每次调用 next() 或迭代时的元素；
+# 内置函数 iter() 将可迭代对象转化为迭代器
+# 创建迭代器对象的好处是当序列长度很大时，可以减少内存消耗，因为每次只需要记录一个值即刻
+
+
+def grep(pattern):
+    print('Looking for {}'.format(pattern))
+    try:
+        while True:
+            line = yield
+            if line is None:
+                break
+            else:
+                if pattern in line:
+                    print('{} : grep success'.format(line))
+    except GeneratorExit:
+        print("Going away,Goodbye. ")
+
+
+g = grep('python') 
+g
+next(g)
+g.send("Hello,buT Nothing,but yeah,bt no")
+g.send("pyhon generators rock!")
+g.close()
+
+
+class Container1:
+    def __init__(self,start = 0,end = 0):
+        self.start = start
+        self.end = end
+    def __iter__(self):
+        print("[LOG] I made  this iterator")
+        return self
+    def __next__(self):
+        print("[log] Calling __next__ method!")
+        if self.start < self.end:
+            i = self.start
+            self.start += 1
+            return i
+        else:
+            raise StopIteration()
+c1 = Container1(0,5)
+
+for i in c:
+    print(i)
+
+# 利用生成器（generator）生成迭代器。生成器通过 yield 语句快速生成迭代器，省略了复杂的 __iter__() & __next__() 方式：    
+def Container2(start,end):
+    while start < end:
+        yield start
+        start += 1
+c2 = Container2(0,5)
+print(type(c2))
+print(next(c2))
+next(c2)
+for i2 in c2:
+    print(i2)
+# 简单来说，yield 语句可以让普通函数变成一个生成器，并且相应的 __next__() 方法返回的是 yield 后面的值。
+# 一种更直观的解释是：程序执行到 yield 会返回值并暂停，再次调用 next() 时会从上次暂停的地方继续开始执行：    
+def gen():
+    yield 5
+    yield "Hello"
+    yield "World"
+    yield 4
+for i in gen():
+    print(i)
+
