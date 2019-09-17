@@ -1,4 +1,5 @@
 # https://www.jianshu.com/p/2ed9a88f5769
+# https://segmentfault.com/a/1190000015745010
 # 迭代器(Iterator)
 # 使用for.in.来操作可迭代对象，如：list,string,files,这些迭代对象非常方便我们使用，因为你可以按照你的意愿进行重复的读取。
 # 但是你不得不预先存储所有的元素在内存中，那些对象里有很多元素时，并不是每一项都对你有用。
